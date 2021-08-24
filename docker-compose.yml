@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  
+  frontend:
+    container_name: gces-ti-frontend
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client/:/usr/src/client
+    ports:
+      - "8080:8080"
+
+  backend:
+    container_name: gces-ti-backend
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ./api/api:/usr/src/api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres_db
+
+    links:
+      - postgres_db:postgres_db
+
+  postgres_db:
+    container_name: gces-ti-db
+    restart: always
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=myproject
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
